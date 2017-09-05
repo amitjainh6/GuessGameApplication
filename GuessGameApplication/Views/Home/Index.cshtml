@@ -2,30 +2,85 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <h1>ASP.NET</h1>
-    <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+@model List<string>
+
+<script>
+
+    function ButtonClicked(value) {
+        ShowQuestion(value)
+    };
+
+    function ShowQuestion(value) {
+        var id = 0;
+        var boolString = '';
+
+        if (value == 'start') {
+            $('#question').data('boolValue', boolString);
+        }
+        else {
+            id = $('#question').data('id');
+            boolString = $('#question').data('boolValue') + value;
+            $('#question').data('boolValue', boolString);
+        }
+
+        $.getJSON("/Home/GetQuestion/", { 'id': id, 'boolString': boolString } , function (result) {
+            if (result.questionID != 'answer') {
+                $('#questionPanel').show();
+                $('#answerPanel').hide();
+                $('#question').text(result.question);
+                $('#question').data('id', result.questionID);
+            }
+            else {
+                $('#questionPanel').hide();
+                $('#answerPanel').show();
+                $('#answer').text(result.question);
+            }
+        });
+    }
+    function StartGame() {
+        ShowQuestion('start');
+        $('#Animal').hide();
+        $('#Game').show();
+
+    }
+    function ReStartGame() {
+        $('#Animal').show();
+        $('#Game').hide();
+    }
+</script>
+
+<div class="jumbotron" id="Animal">
+    <h1>Aminals in our list</h1>
+    @foreach (var item in Model)
+    {
+        <div class="col-md-12">
+            <h2>@item </h2>
+        </div>
+    }
+    <div class="col-md-12">
+        <a id="start" class="btn btn-default" onclick="StartGame()">Start the Game</a>
+    </div>
 </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+<div class="jumbotron" id="Game" hidden>
+    <h1>Let us find out the animal your are thinking about</h1>
+    <div id="questionPanel">
+        <div class="col-md-12">
+            <h2 id="question"></h2>
+
+        </div>
+        <div class="col-md-12">
+            <a id="btnYes" class="btn btn-default" onclick="ButtonClicked('1')">Yes</a>
+            <a id="btnNo" class="btn btn-default" onclick="ButtonClicked('0')">No</a>
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+    <div id="answerPanel">
+        <div class="col-md-12">
+            <h2 id="answer"></h2>
+
+        </div>
     </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+    <div class="col-md-12">
+        <a id="reStart" class="btn btn-default" onclick="ReStartGame()">Re-Start</a>
     </div>
 </div>
